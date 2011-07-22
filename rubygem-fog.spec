@@ -6,7 +6,7 @@
 Summary: brings clouds to you
 Name: rubygem-%{gemname}
 Version: 0.9.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 Group: Development/Languages
 License: MIT
 URL: http://github.com/geemus/fog
@@ -20,7 +20,7 @@ Requires: rubygem(mime-types)
 Requires: rubygem(net-scp) >= 1.0.4
 Requires: rubygem(net-ssh) >= 2.1.4
 Requires: rubygem(nokogiri) >= 1.4.4
-Requires: rubygem(ruby-hmac)
+Requires: rubygem(hmac)
 BuildRequires: ruby(rubygems)
 BuildArch: noarch
 Provides: rubygem(%{gemname}) = %{version}
@@ -57,6 +57,9 @@ find %{buildroot}%{geminstdir}/bin -type f | xargs chmod a+x
 
 
 %changelog
+* Fri Jul 22 2011 Chris Lalancette <clalance@redhat.com> - 0.9.0-3
+- Fix the hmac dependency
+
 * Fri Jul 08 2011 Chris Lalancette <clalance@redhat.com> - 0.9.0-2
 - Use global macro instead of define
 
