@@ -1,4 +1,3 @@
-# Generated from fog-0.9.0.gem by gem2rpm -*- rpm-spec -*-
 %global gemdir %(ruby -rubygems -e 'puts Gem::dir' 2>/dev/null)
 %global gemname fog
 %global geminstdir %{gemdir}/gems/%{gemname}-%{version}
@@ -6,7 +5,7 @@
 Summary: brings clouds to you
 Name: rubygem-%{gemname}
 Version: 0.9.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 Group: Development/Languages
 License: MIT
 URL: http://github.com/geemus/fog
@@ -18,7 +17,7 @@ Requires: rubygem(formatador) >= 0.1.3
 Requires: rubygem(json)
 Requires: rubygem(mime-types)
 Requires: rubygem(net-scp) >= 1.0.4
-Requires: rubygem(net-ssh) >= 2.1.4
+Requires: rubygem(net-ssh)
 Requires: rubygem(nokogiri) >= 1.4.4
 Requires: rubygem(hmac)
 BuildRequires: ruby(rubygems)
@@ -57,6 +56,9 @@ find %{buildroot}%{geminstdir}/bin -type f | xargs chmod a+x
 
 
 %changelog
+* Mon Aug 01 2011 Chris Lalancette <clalance@redhat.com> - 0.9.0-4
+- Remove the net-ssh version; any version should work
+
 * Fri Jul 22 2011 Chris Lalancette <clalance@redhat.com> - 0.9.0-3
 - Fix the hmac dependency
 
