@@ -5,7 +5,7 @@
 Summary: brings clouds to you
 Name: rubygem-%{gemname}
 Version: 0.9.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 Group: Development/Languages
 License: MIT
 URL: http://github.com/geemus/fog
@@ -56,6 +56,9 @@ find %{buildroot}%{geminstdir}/bin -type f | xargs chmod a+x
 
 
 %changelog
+* Tue Sep 06 2011 Chris Lalancette <clalance@redhat.com> - 0.9.0-5
+- Bump the release version to make upgrades from F-16 work
+
 * Mon Aug 01 2011 Chris Lalancette <clalance@redhat.com> - 0.9.0-4
 - Remove the net-ssh version; any version should work
 
