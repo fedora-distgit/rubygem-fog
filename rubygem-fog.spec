@@ -5,7 +5,7 @@
 Summary: brings clouds to you
 Name: rubygem-%{gemname}
 Version: 0.9.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 Group: Development/Languages
 License: MIT
 URL: http://github.com/geemus/fog
@@ -56,6 +56,9 @@ find %{buildroot}%{geminstdir}/bin -type f | xargs chmod a+x
 
 
 %changelog
+* Sat Jan 14 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.9.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
+
 * Tue Sep 06 2011 Chris Lalancette <clalance@redhat.com> - 0.9.0-5
 - Bump the release version to make upgrades from F-16 work
 
