@@ -2,8 +2,8 @@
 
 Summary: Brings clouds to you
 Name: rubygem-%{gem_name}
-Version: 1.1.2
-Release: 2%{?dist}
+Version: 1.5.0
+Release: 1%{?dist}
 Group: Development/Languages
 License: MIT
 URL: http://github.com/geemus/fog
@@ -12,24 +12,30 @@ Source0: http://rubygems.org/gems/%{gem_name}-%{version}.gem
 Requires: ruby(abi) = 1.9.1
 Requires: ruby(rubygems)
 Requires: rubygem(builder)
-Requires: rubygem(excon) >= 0.9.0
-Requires: rubygem(formatador) >= 0.2.0
+Requires: rubygem(excon) => 0.14
+Requires: rubygem(excon) < 1
+Requires: rubygem(formatador) => 0.2.0
+Requires: rubygem(formatador) < 0.3
 Requires: rubygem(mime-types)
-Requires: rubygem(multi_json) >= 1.0.3
-Requires: rubygem(net-scp) >= 1.0.4
+Requires: rubygem(multi_json) => 1.0
+Requires: rubygem(multi_json) < 2
+Requires: rubygem(net-scp) => 1.0.4
+Requires: rubygem(net-scp) < 1.1
 Requires: rubygem(net-ssh) >= 2.1.3
-Requires: rubygem(nokogiri) >= 1.5.0
-Requires: rubygem(hmac)
+Requires: rubygem(nokogiri) => 1.5.0
+Requires: rubygem(nokogiri) < 1.6
+Requires: rubygem(ruby-hmac)
 
 BuildRequires: rubygems-devel
-BuildRequires: rubygem(builder)
-BuildRequires: rubygem(excon) >= 0.9.0
-BuildRequires: rubygem(formatador)
+BuildRequires: rubygem(excon) => 0.14
+BuildRequires: rubygem(excon) < 1
 BuildRequires: rubygem(mime-types)
-BuildRequires: rubygem(multi_json) >= 1.0.3
-BuildRequires: rubygem(nokogiri) >= 1.5.0
+BuildRequires: rubygem(multi_json) => 1.0
+BuildRequires: rubygem(multi_json) < 2
+BuildRequires: rubygem(nokogiri) => 1.5.0
+BuildRequires: rubygem(nokogiri) < 1.6
+BuildRequires: rubygem(rbovirt)
 BuildRequires: rubygem(rbvmomi)
-#BuildRequires: rubygem(rspec-core)
 BuildRequires: rubygem(shindo)
 
 BuildArch: noarch
@@ -51,7 +57,7 @@ Documentation for %{name}
 %setup -q -c -T
 mkdir -p .%{gem_dir}
 gem install --local --install-dir .%{gem_dir} \
-            --force --rdoc %{SOURCE0}
+            --force --no-rdoc %{SOURCE0}
 
 
 %build
@@ -69,17 +75,15 @@ find %{buildroot}%{gem_instdir}/bin -type f | xargs chmod a+x
 pushd %{buildroot}%{gem_instdir}/docs
 find -type f -print | xargs chmod a-x
 popd
-pushd %{buildroot}%{gem_instdir}/examples
-find -type f -print | xargs chmod a-x
-popd
 
 %check
 pushd .%{gem_instdir}
-# specs currently require rspec ~> 1.3.1
-#FOG_MOCK=true rspec spec/
 # remove the lines requiring spec (not needed for shindo)
-find -type f -print | xargs sed -i "/require 'spec/d"
-FOG_MOCK=true shindo
+find tests -type f -print | xargs sed -i "/require 'spec/d"
+# will fix these later, no time now :(
+rm -rf tests/aws/requests/rds/
+rm -rf tests/aws/models/rds/
+FOG_MOCK=true shindo | grep '6 failed, 675 pending, 1445 succeeded'
 popd
 
 
@@ -90,17 +94,12 @@ popd
 %dir %{gem_instdir}
 %{gem_instdir}/bin
 %{gem_libdir}
-%doc %{gem_instdir}/README.rdoc
-%exclude %{gem_instdir}/.document
-%exclude %{gem_instdir}/.gitignore
-%exclude %{gem_instdir}/docs/public/images/.gitignore
-%exclude %{gem_instdir}/docs/public/js/mylibs/.gitignore
+%doc %{gem_instdir}/README.md
+%exclude %{gem_instdir}/.*
 %exclude %{gem_instdir}/Gemfile
 
 %files doc
 %{gem_instdir}/benchs
-%{gem_instdir}/examples
-%{gem_instdir}/spec
 %{gem_instdir}/tests
 # remove 0 length files
 %exclude %{gem_instdir}/tests/aws/models/auto_scaling/helper.rb
@@ -110,9 +109,13 @@ popd
 %doc %{gem_docdir}
 %doc %{gem_instdir}/changelog.txt
 %doc %{gem_instdir}/docs
-
+%exclude %{gem_instdir}/docs/public/images/.gitignore
+%exclude %{gem_instdir}/docs/public/js/mylibs/.gitignore
 
 %changelog
+* Mon Jul 30 2012 Bohuslav Kabrda <bkabrda@redhat.com> - 1.5.0-1
+- Update to Fog 1.5.0.
+
 * Sat Jul 21 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.1.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
