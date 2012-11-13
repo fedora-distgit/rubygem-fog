@@ -2,8 +2,8 @@
 
 Summary: Brings clouds to you
 Name: rubygem-%{gem_name}
-Version: 1.5.0
-Release: 2%{?dist}
+Version: 1.7.0
+Release: 1%{?dist}
 Group: Development/Languages
 License: MIT
 URL: http://github.com/geemus/fog
@@ -114,6 +114,9 @@ popd
 %exclude %{gem_instdir}/docs/public/js/mylibs/.gitignore
 
 %changelog
+* Tue Nov 13 2012 Bohuslav Kabrda <bkabrda@redhat.com> - 1.7.0-1
+- Update to Fog 1.7.0.
+
 * Tue Jul 31 2012 Bohuslav Kabrda <bkabrda@redhat.com> - 1.5.0-2
 - Fix handling of failing tests.
 
