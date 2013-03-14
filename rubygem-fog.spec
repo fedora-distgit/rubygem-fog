@@ -3,13 +3,13 @@
 Summary: Brings clouds to you
 Name: rubygem-%{gem_name}
 Version: 1.7.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 Group: Development/Languages
 License: MIT
 URL: http://github.com/geemus/fog
 Source0: http://rubygems.org/gems/%{gem_name}-%{version}.gem
 
-Requires: ruby(abi) = 1.9.1
+Requires: ruby(release)
 Requires: ruby(rubygems)
 Requires: rubygem(builder)
 Requires: rubygem(excon) => 0.14
@@ -55,9 +55,7 @@ Documentation for %{name}
 
 %prep
 %setup -q -c -T
-mkdir -p .%{gem_dir}
-gem install --local --install-dir .%{gem_dir} \
-            --force --no-rdoc %{SOURCE0}
+%gem_install -n %{SOURCE0}
 
 
 %build
@@ -67,8 +65,7 @@ mkdir -p %{buildroot}%{gem_dir}
 cp -a .%{gem_dir}/* %{buildroot}%{gem_dir}/
 
 mkdir -p %{buildroot}/%{_bindir}
-mv %{buildroot}%{gem_dir}/bin/* %{buildroot}/%{_bindir}
-rmdir %{buildroot}%{gem_dir}/bin
+mv .%{_bindir}/* %{buildroot}/%{_bindir}
 find %{buildroot}%{gem_instdir}/bin -type f | xargs chmod a+x
 
 # fix permissions
@@ -114,6 +111,9 @@ popd
 %exclude %{gem_instdir}/docs/public/js/mylibs/.gitignore
 
 %changelog
+* Thu Mar 14 2013 Bohuslav Kabrda <bkabrda@redhat.com> - 1.7.0-3
+- Rebuild for https://fedoraproject.org/wiki/Features/Ruby_2.0.0
+
 * Thu Feb 14 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.7.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
 
