@@ -2,8 +2,8 @@
 
 Summary: Brings clouds to you
 Name: rubygem-%{gem_name}
-Version: 1.7.0
-Release: 3%{?dist}
+Version: 1.11.1
+Release: 1%{?dist}
 Group: Development/Languages
 License: MIT
 URL: http://github.com/geemus/fog
@@ -12,22 +12,22 @@ Source0: http://rubygems.org/gems/%{gem_name}-%{version}.gem
 Requires: ruby(release)
 Requires: ruby(rubygems)
 Requires: rubygem(builder)
-Requires: rubygem(excon) => 0.14
+Requires: rubygem(excon) => 0.20
 Requires: rubygem(excon) < 1
 Requires: rubygem(formatador) => 0.2.0
 Requires: rubygem(formatador) < 0.3
+Requires: rubygem(json) => 1.7
+Requires: rubygem(json) < 2
 Requires: rubygem(mime-types)
-Requires: rubygem(multi_json) => 1.0
-Requires: rubygem(multi_json) < 2
-Requires: rubygem(net-scp) => 1.0.4
-Requires: rubygem(net-scp) < 1.1
+Requires: rubygem(net-scp) => 1.1
+Requires: rubygem(net-scp) < 2
 Requires: rubygem(net-ssh) >= 2.1.3
 Requires: rubygem(nokogiri) => 1.5.0
 Requires: rubygem(nokogiri) < 1.6
 Requires: rubygem(ruby-hmac)
 
 BuildRequires: rubygems-devel
-BuildRequires: rubygem(excon) => 0.14
+BuildRequires: rubygem(excon) => 0.20
 BuildRequires: rubygem(excon) < 1
 BuildRequires: rubygem(mime-types)
 BuildRequires: rubygem(multi_json) => 1.0
@@ -37,6 +37,7 @@ BuildRequires: rubygem(nokogiri) < 1.6
 BuildRequires: rubygem(rbovirt)
 BuildRequires: rubygem(rbvmomi)
 BuildRequires: rubygem(shindo)
+BuildRequires: rubygem(rspec)
 
 BuildArch: noarch
 Provides: rubygem(%{gem_name}) = %{version}
@@ -62,26 +63,22 @@ Documentation for %{name}
 
 %install
 mkdir -p %{buildroot}%{gem_dir}
-cp -a .%{gem_dir}/* %{buildroot}%{gem_dir}/
+cp -pa .%{gem_dir}/* \
+        %{buildroot}%{gem_dir}/
 
 mkdir -p %{buildroot}/%{_bindir}
-mv .%{_bindir}/* %{buildroot}/%{_bindir}
-find %{buildroot}%{gem_instdir}/bin -type f | xargs chmod a+x
+cp -pa .%{_bindir}/* \
+        %{buildroot}%{_bindir}/
 
-# fix permissions
-pushd %{buildroot}%{gem_instdir}/docs
-find -type f -print | xargs chmod a-x
-popd
+find %{buildroot}%{gem_instdir}/bin -type f | xargs chmod a+x
 
 %check
 pushd .%{gem_instdir}
-# remove the lines requiring spec (not needed for shindo)
-find tests -type f -print | xargs sed -i "/require 'spec/d"
-# will fix these later, no time now :(
-rm -rf tests/aws/requests/rds/
-rm -rf tests/aws/models/rds/
-export FOG_MOCK=true
-shindo || :
+# we need RSpec 2
+# https://github.com/fog/fog/pull/1813
+sed -i 's/spec/rspec/' tests/vcloud/requests/compute/disk_configure_tests.rb
+
+FOG_MOCK=true shindo
 popd
 
 
@@ -97,6 +94,7 @@ popd
 %exclude %{gem_instdir}/Gemfile
 
 %files doc
+%doc %{gem_instdir}/RELEASE.md
 %{gem_instdir}/benchs
 %{gem_instdir}/tests
 # remove 0 length files
@@ -106,11 +104,13 @@ popd
 %{gem_instdir}/Rakefile
 %doc %{gem_docdir}
 %doc %{gem_instdir}/changelog.txt
-%doc %{gem_instdir}/docs
 %exclude %{gem_instdir}/docs/public/images/.gitignore
 %exclude %{gem_instdir}/docs/public/js/mylibs/.gitignore
 
 %changelog
+* Mon May 13 2013 Josef Stribny <jstribny@redhat.com> - 1.11.1-1
+- Update to Fog 1.11.1
+
 * Thu Mar 14 2013 Bohuslav Kabrda <bkabrda@redhat.com> - 1.7.0-3
 - Rebuild for https://fedoraproject.org/wiki/Features/Ruby_2.0.0
 
