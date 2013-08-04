@@ -3,7 +3,7 @@
 Summary: Brings clouds to you
 Name: rubygem-%{gem_name}
 Version: 1.11.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 Group: Development/Languages
 License: MIT
 URL: http://github.com/geemus/fog
@@ -108,6 +108,9 @@ popd
 %exclude %{gem_instdir}/docs/public/js/mylibs/.gitignore
 
 %changelog
+* Sun Aug 04 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.11.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
+
 * Mon May 13 2013 Josef Stribny <jstribny@redhat.com> - 1.11.1-1
 - Update to Fog 1.11.1
 
