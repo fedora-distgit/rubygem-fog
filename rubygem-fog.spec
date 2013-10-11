@@ -2,8 +2,8 @@
 
 Summary: Brings clouds to you
 Name: rubygem-%{gem_name}
-Version: 1.11.1
-Release: 2%{?dist}
+Version: 1.15.0
+Release: 1%{?dist}
 Group: Development/Languages
 License: MIT
 URL: http://github.com/geemus/fog
@@ -19,11 +19,11 @@ Requires: rubygem(formatador) < 0.3
 Requires: rubygem(json) => 1.7
 Requires: rubygem(json) < 2
 Requires: rubygem(mime-types)
+Requires: rubygem(nokogiri) => 1.5
+Requires: rubygem(nokogiri) < 2.0
 Requires: rubygem(net-scp) => 1.1
 Requires: rubygem(net-scp) < 2
 Requires: rubygem(net-ssh) >= 2.1.3
-Requires: rubygem(nokogiri) => 1.5.0
-Requires: rubygem(nokogiri) < 1.6
 Requires: rubygem(ruby-hmac)
 
 BuildRequires: rubygems-devel
@@ -32,11 +32,15 @@ BuildRequires: rubygem(excon) < 1
 BuildRequires: rubygem(mime-types)
 BuildRequires: rubygem(multi_json) => 1.0
 BuildRequires: rubygem(multi_json) < 2
-BuildRequires: rubygem(nokogiri) => 1.5.0
-BuildRequires: rubygem(nokogiri) < 1.6
+BuildRequires: rubygem(net-scp) => 1.1
+BuildRequires: rubygem(net-scp) < 2
+BuildRequires: rubygem(net-ssh) >= 2.1.3
+BuildRequires: rubygem(nokogiri) => 1.5
+BuildRequires: rubygem(nokogiri) < 2.0
 BuildRequires: rubygem(rbovirt)
 BuildRequires: rubygem(rbvmomi)
 BuildRequires: rubygem(shindo)
+BuildRequires: rubygem(simplecov)
 BuildRequires: rubygem(rspec)
 
 BuildArch: noarch
@@ -74,11 +78,8 @@ find %{buildroot}%{gem_instdir}/bin -type f | xargs chmod a+x
 
 %check
 pushd .%{gem_instdir}
-# we need RSpec 2
-# https://github.com/fog/fog/pull/1813
-sed -i 's/spec/rspec/' tests/vcloud/requests/compute/disk_configure_tests.rb
-
-FOG_MOCK=true shindo
+# rubygem-coveralls is not yet in Fedora
+COVERAGE=false FOG_MOCK=true shindo
 popd
 
 
@@ -92,6 +93,7 @@ popd
 %doc %{gem_instdir}/README.md
 %exclude %{gem_instdir}/.*
 %exclude %{gem_instdir}/Gemfile
+%exclude %{gem_instdir}/Gemfile.1.8.7
 
 %files doc
 %doc %{gem_instdir}/RELEASE.md
@@ -108,6 +110,9 @@ popd
 %exclude %{gem_instdir}/docs/public/js/mylibs/.gitignore
 
 %changelog
+* Wed Oct 09 2013 Josef Stribny <jstribny@redhat.com> - 1.15.0-1
+- Update to Fog 1.15.0
+
 * Sun Aug 04 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.11.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 
