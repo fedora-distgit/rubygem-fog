@@ -2,49 +2,25 @@
 
 Summary: Brings clouds to you
 Name: rubygem-%{gem_name}
-Version: 1.15.0
-Release: 2%{?dist}
+Version: 1.22.0
+Release: 1%{?dist}
 Group: Development/Languages
 License: MIT
 URL: http://github.com/geemus/fog
 Source0: http://rubygems.org/gems/%{gem_name}-%{version}.gem
 
-Requires: ruby(release)
-Requires: ruby(rubygems)
-Requires: rubygem(builder)
-Requires: rubygem(excon) => 0.20
-Requires: rubygem(excon) < 1
-Requires: rubygem(formatador) => 0.2.0
-Requires: rubygem(formatador) < 0.3
-Requires: rubygem(json) => 1.7
-Requires: rubygem(json) < 2
-Requires: rubygem(mime-types)
-Requires: rubygem(nokogiri) => 1.5
-Requires: rubygem(nokogiri) < 2.0
-Requires: rubygem(net-scp) => 1.1
-Requires: rubygem(net-scp) < 2
-Requires: rubygem(net-ssh) >= 2.1.3
-Requires: rubygem(ruby-hmac)
 
 BuildRequires: rubygems-devel
-BuildRequires: rubygem(excon) => 0.20
-BuildRequires: rubygem(excon) < 1
-BuildRequires: rubygem(mime-types)
-BuildRequires: rubygem(multi_json) => 1.0
-BuildRequires: rubygem(multi_json) < 2
-BuildRequires: rubygem(net-scp) => 1.1
-BuildRequires: rubygem(net-scp) < 2
-BuildRequires: rubygem(net-ssh) >= 2.1.3
-BuildRequires: rubygem(nokogiri) => 1.5
-BuildRequires: rubygem(nokogiri) < 2.0
+BuildRequires: rubygem(fog-brightbox)
+BuildRequires: rubygem(fog-core)
+BuildRequires: rubygem(fog-json)
+BuildRequires: rubygem(nokogiri)
 BuildRequires: rubygem(rbovirt)
 BuildRequires: rubygem(rbvmomi)
+BuildRequires: rubygem(ruby-libvirt)
 BuildRequires: rubygem(shindo)
-BuildRequires: rubygem(simplecov)
-BuildRequires: rubygem(rspec)
 
 BuildArch: noarch
-Provides: rubygem(%{gem_name}) = %{version}
 
 %description
 The Ruby cloud services library.
@@ -76,28 +52,43 @@ cp -pa .%{_bindir}/* \
 
 find %{buildroot}%{gem_instdir}/bin -type f | xargs chmod a+x
 
+# Fix anything executable that does not have a shebang
+for file in `find %{buildroot}/%{gem_instdir} -type f -perm /a+x`; do
+    [ -z "`head -n 1 $file | grep \"^#!/\"`" ] && chmod -v 644 $file
+done
+
+# Find files with a shebang that do not have executable permissions
+for file in `find %{buildroot}/%{gem_instdir} -type f ! -perm /a+x -name "*.rb"`; do
+    [ ! -z "`head -n 1 $file | grep \"^#!/\"`" ] && chmod -v 755 $file
+done
+
 %check
 pushd .%{gem_instdir}
-# rubygem-coveralls is not yet in Fedora
+# Disable coverage.
+sed -i "/require 'simplecov'/ s/^/#/" tests/helper.rb
 COVERAGE=false FOG_MOCK=true shindo
 popd
 
 
 %files
+%doc %{gem_instdir}/LICENSE.md
 %{_bindir}/fog
 %exclude %{gem_cache}
 %{gem_spec}
 %dir %{gem_instdir}
 %{gem_instdir}/bin
 %{gem_libdir}
-%doc %{gem_instdir}/README.md
 %exclude %{gem_instdir}/.*
 %exclude %{gem_instdir}/Gemfile
-%exclude %{gem_instdir}/Gemfile.1.8.7
 
 %files doc
+%doc %{gem_instdir}/CHANGELOG.md
+%doc %{gem_instdir}/CONTRIBUT*
+%doc %{gem_instdir}/README.md
 %doc %{gem_instdir}/RELEASE.md
 %{gem_instdir}/benchs
+%{gem_instdir}/gemfiles
+%{gem_instdir}/spec
 %{gem_instdir}/tests
 # remove 0 length files
 %exclude %{gem_instdir}/tests/aws/models/auto_scaling/helper.rb
@@ -105,11 +96,11 @@ popd
 %{gem_instdir}/fog.gemspec
 %{gem_instdir}/Rakefile
 %doc %{gem_docdir}
-%doc %{gem_instdir}/changelog.txt
-%exclude %{gem_instdir}/docs/public/images/.gitignore
-%exclude %{gem_instdir}/docs/public/js/mylibs/.gitignore
 
 %changelog
+* Mon Jun 09 2014 Vít Ondruch <vondruch@redhat.com> - 1.22.0-1
+- Update to Fog 1.22.0.
+
 * Sun Jun 08 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.15.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
 
