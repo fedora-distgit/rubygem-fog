@@ -2,7 +2,7 @@
 
 Summary: Brings clouds to you
 Name: rubygem-%{gem_name}
-Version: 1.22.0
+Version: 1.22.1
 Release: 1%{?dist}
 Group: Development/Languages
 License: MIT
@@ -14,6 +14,7 @@ BuildRequires: rubygems-devel
 BuildRequires: rubygem(fog-brightbox)
 BuildRequires: rubygem(fog-core)
 BuildRequires: rubygem(fog-json)
+BuildRequires: rubygem(ipaddress)
 BuildRequires: rubygem(nokogiri)
 BuildRequires: rubygem(rbovirt)
 BuildRequires: rubygem(rbvmomi)
@@ -103,6 +104,9 @@ popd
 %doc %{gem_docdir}
 
 %changelog
+* Mon Jun 09 2014 Vít Ondruch <vondruch@redhat.com> - 1.22.1-1
+- Update to Fog 1.22.1.
+
 * Mon Jun 09 2014 Vít Ondruch <vondruch@redhat.com> - 1.22.0-1
 - Update to Fog 1.22.0.
 
