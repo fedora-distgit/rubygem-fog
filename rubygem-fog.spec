@@ -66,6 +66,11 @@ done
 pushd .%{gem_instdir}
 # Disable coverage.
 sed -i "/require 'simplecov'/ s/^/#/" tests/helper.rb
+
+# The test fails without network connection.
+# https://github.com/fog/fog/issues/2986
+mv tests/hp/block_storage_tests.rb{,.bak}
+
 COVERAGE=false FOG_MOCK=true shindo
 popd
 
