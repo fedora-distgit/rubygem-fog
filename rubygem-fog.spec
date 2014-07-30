@@ -2,7 +2,7 @@
 
 Summary: Brings clouds to you
 Name: rubygem-%{gem_name}
-Version: 1.22.1
+Version: 1.23.0
 Release: 1%{?dist}
 Group: Development/Languages
 License: MIT
@@ -104,6 +104,9 @@ popd
 %doc %{gem_docdir}
 
 %changelog
+* Tue Jul 29 2014 Brett Lentz <blentz@redhat.com> - 1.23.0-1
+- Update to Fog 1.23.0.
+
 * Mon Jun 09 2014 Vít Ondruch <vondruch@redhat.com> - 1.22.1-1
 - Update to Fog 1.22.1.
 
