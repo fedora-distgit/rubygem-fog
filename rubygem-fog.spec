@@ -14,6 +14,7 @@ BuildRequires: rubygems-devel
 BuildRequires: rubygem(fog-brightbox)
 BuildRequires: rubygem(fog-core)
 BuildRequires: rubygem(fog-json)
+BuildRequires: rubygem(fog-softlayer)
 BuildRequires: rubygem(ipaddress)
 BuildRequires: rubygem(nokogiri)
 BuildRequires: rubygem(rbovirt)
