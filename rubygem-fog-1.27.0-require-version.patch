@@ -1,0 +1,25 @@
+From 63baf5de8f3ed299afc936283899272ab1c9d570 Mon Sep 17 00:00:00 2001
+From: Josef Stribny <jstribny@redhat.com>
+Date: Mon, 9 Mar 2015 13:09:49 +0100
+Subject: [PATCH] Require version
+
+---
+ lib/fog.rb | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/lib/fog.rb b/lib/fog.rb
+index 47db4b8..cfb1780 100644
+--- a/lib/fog.rb
++++ b/lib/fog.rb
+@@ -3,6 +3,8 @@
+ __LIB_DIR__ = File.expand_path(File.dirname(__FILE__))
+ $LOAD_PATH.unshift __LIB_DIR__ unless $LOAD_PATH.include?(__LIB_DIR__)
+ 
++require 'fog/version'
++
+ # Use core
+ require 'fog/core'
+ 
+-- 
+2.1.0
+
