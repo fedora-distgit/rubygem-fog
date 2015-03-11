@@ -3,7 +3,7 @@
 Summary: Brings clouds to you
 Name: rubygem-%{gem_name}
 Version: 1.23.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 Group: Development/Languages
 License: MIT
 URL: http://github.com/geemus/fog
@@ -44,6 +44,11 @@ Documentation for %{name}
 pushd .%{gem_instdir}
 %patch0 -p1
 %patch1 -p1
+
+# Fix duplicate key warning, the key is not used anyway and it shows up when using Vagrant
+# https://github.com/fog/fog/commit/189ab1c677e88f670f9269b0857efeb1e18f64ea
+sed -i 's/"name" => "Ubuntu",/#"name" => "Ubuntu",/' lib/fog/rackspace/mock_data.rb
+
 popd
 
 %build
@@ -112,6 +117,9 @@ popd
 %doc %{gem_docdir}
 
 %changelog
+* Wed Mar 11 2015 Josef Stribny <jstribny@redhat.com> - 1.23.0-3
+- Fix duplicate key warning
+
 * Tue Mar 10 2015 Josef Stribny <jstribny@redhat.com> - 1.23.0-2
 - Patch for Ruby 2.2 support
 
