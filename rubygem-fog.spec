@@ -2,54 +2,56 @@
 
 Summary: Brings clouds to you
 Name: rubygem-%{gem_name}
-Version: 1.23.0
-Release: 3%{?dist}
+Version: 1.28.0
+Release: 1%{?dist}
 Group: Development/Languages
 License: MIT
-URL: http://github.com/geemus/fog
-Source0: http://rubygems.org/gems/%{gem_name}-%{version}.gem
-Patch0: rubygem-fog-1.27.0-support-ruby-2.2.patch
-Patch1: rubygem-fog-1.27.0-require-version.patch
+URL: http://github.com/fog/fog
+Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
 
+BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
+BuildRequires: ruby
+BuildRequires: rubygem(fog-atmos)
+BuildRequires: rubygem(fog-aws)
 BuildRequires: rubygem(fog-brightbox)
 BuildRequires: rubygem(fog-core)
+BuildRequires: rubygem(fog-ecloud)
 BuildRequires: rubygem(fog-json)
+BuildRequires: rubygem(fog-profitbricks)
+BuildRequires: rubygem(fog-riakcs)
+BuildRequires: rubygem(fog-sakuracloud)
+BuildRequires: rubygem(fog-serverlove)
 BuildRequires: rubygem(fog-softlayer)
-BuildRequires: rubygem(ipaddress)
-BuildRequires: rubygem(nokogiri)
+BuildRequires: rubygem(fog-storm_on_demand)
+BuildRequires: rubygem(fog-terremark)
+BuildRequires: rubygem(fog-vmfusion)
+BuildRequires: rubygem(fog-voxel)
+BuildRequires: rubygem(fog-xml)
 BuildRequires: rubygem(rbovirt)
 BuildRequires: rubygem(rbvmomi)
-BuildRequires: rubygem(ruby-libvirt)
 BuildRequires: rubygem(shindo)
 
 BuildArch: noarch
 
 %description
-The Ruby cloud services library.
+The Ruby cloud services library. Supports all major cloud providers including
+AWS, Rackspace, Linode, Blue Box, StormOnDemand, and many others. Full support
+for most AWS services including EC2, S3, CloudWatch, SimpleDB, ELB, and RDS.
 
 %package doc
 Summary: Documentation for %{name}
 Group: Documentation
 Requires: %{name} = %{version}-%{release}
+BuildArch: noarch
 
 %description doc
-Documentation for %{name}
+Documentation for %{name}.
 
 
 %prep
 %setup -q -c -T
 %gem_install -n %{SOURCE0}
-
-pushd .%{gem_instdir}
-%patch0 -p1
-%patch1 -p1
-
-# Fix duplicate key warning, the key is not used anyway and it shows up when using Vagrant
-# https://github.com/fog/fog/commit/189ab1c677e88f670f9269b0857efeb1e18f64ea
-sed -i 's/"name" => "Ubuntu",/#"name" => "Ubuntu",/' lib/fog/rackspace/mock_data.rb
-
-popd
 
 %build
 
@@ -76,16 +78,11 @@ done
 
 %check
 pushd .%{gem_instdir}
-# Disable coverage.
-sed -i "/require 'simplecov'/ s/^/#/" tests/helper.rb
-
 # The test fails without network connection.
 # https://github.com/fog/fog/issues/2986
 mv tests/hp/block_storage_tests.rb{,.bak}
 
-# 1 failure: Newer fog-core puts itself to user agent
-# See https://github.com/fog/fog-core/blob/v1.27.0/lib/fog/core/connection.rb#L37
-COVERAGE=false FOG_MOCK=true shindo | grep '1 failed'
+FOG_MOCK=true shindo
 popd
 
 
@@ -117,6 +114,9 @@ popd
 %doc %{gem_docdir}
 
 %changelog
+* Tue Mar 24 2015 Vít Ondruch <vondruch@redhat.com> - 1.28.0-1
+- Update to fog 1.28.0.
+
 * Wed Mar 11 2015 Josef Stribny <jstribny@redhat.com> - 1.23.0-3
 - Fix duplicate key warning
 
