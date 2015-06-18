@@ -3,7 +3,7 @@
 Summary: Brings clouds to you
 Name: rubygem-%{gem_name}
 Version: 1.28.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 Group: Development/Languages
 License: MIT
 URL: http://github.com/fog/fog
@@ -114,6 +114,9 @@ popd
 %doc %{gem_docdir}
 
 %changelog
+* Thu Jun 18 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.28.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
+
 * Tue Mar 24 2015 Vít Ondruch <vondruch@redhat.com> - 1.28.0-1
 - Update to fog 1.28.0.
 
