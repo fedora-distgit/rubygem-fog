@@ -82,7 +82,7 @@ unset -v gemspec_remove_dep_script \
 
 Name: rubygem-%{gem_name}
 Version: 1.38.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Brings clouds to you
 Group: Development/Languages
 # ASL 2.0: lib/fog/opennebula/requests/compute/OpenNebulaVNC.rb
@@ -241,6 +241,9 @@ popd
 %exclude %{gem_instdir}/tests/go_grid/requests/compute/image_tests.rb
 
 %changelog
+* Sat Feb 11 2017 Fedora Release Engineering <releng@fedoraproject.org> - 1.38.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
+
 * Tue Sep 13 2016 Vít Ondruch <vondruch@redhat.com> - 1.38.0-1
 - Update to fog 1.38.0.
 
