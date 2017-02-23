@@ -1,88 +1,8 @@
 %global gem_name fog
 
-# Remove as soon as the macros are available in rubygems-devel package:
-# https://lists.fedoraproject.org/archives/list/ruby-sig@lists.fedoraproject.org/thread/ZSGFXCMPGNLLWWXSJH6WPG4TUNOU3JBT/
-
-# The 'read' command not essential, but it is usefull to make the sript
-# appear in build log.
-
-# Add dependency named gem with requirements to .gemspec. It adds runtime
-# dependency by default.
-# -g<gem>            Specifies name of the gem dependency.
-# -s<gemspec_file>   Overrides the default .gemspec location.
-# -d                 Add development dependecy.
-#
-# The remaining arguments are expected to by requirements and should be
-# valid Ruby code.
-%define gemspec_add_dep(g:s:d) \
-read -d '' gemspec_add_dep_script << 'EOR' || : \
-  gemspec_file = '%{-s*}%{!?-s:./%{gem_name}.spec}' \
-  \
-  name = '%{-g*}' \
-  requirements = %{*}%{!?1:nil} \
-  \
-  type = :%{!?-d:runtime}%{?-d:development} \
-  \
-  spec = Gem::Specification.load(gemspec_file) \
-  abort("#{gemspec_file} is not accessible.") unless spec \
-  \
-  dep = spec.dependencies.detect { |d| d.type == type && d.name == name } \
-  if dep \
-    dep.requirement.concat requirements \
-  else \
-    spec.public_send "add_#{type}_dependency", name, requirements \
-  end \
-  File.write gemspec_file, spec.to_ruby \
-EOR\
-echo "$gemspec_add_dep_script" | ruby \
-unset -v gemspec_add_dep_script \
-%{nil}
-
-# Remove  dependency named gem with requirements to .gemspec. It adds runtime
-# dependency by default.
-# -g<gem>            Specifies name of the gem dependency.
-# -s<gemspec_file>   Overrides the default .gemspec location.
-# -d                 Remove development dependecy.
-#
-# If remaing arguments specify some version requirements, the macro fails if
-# these specific requirements can't be removed.
-%define gemspec_remove_dep(g:s:d) \
-read -d '' gemspec_remove_dep_script << 'EOR' || : \
-  gemspec_file = '%{-s*}%{!?-s:./%{gem_name}.spec}' \
-  \
-  name = '%{-g*}' \
-  requirements = %{*}%{!?1:nil} \
-  \
-  type = :%{!?-d:runtime}%{?-d:development} \
-  \
-  spec = Gem::Specification.load(gemspec_file) \
-  abort("#{gemspec_file} is not accessible.") unless spec \
-  \
-  dep = spec.dependencies.detect { |d| d.type == type && d.name == name } \
-  if dep \
-    if requirements \
-      requirements = Gem::Requirement.create(requirements).requirements \
-      requirements.each do |r| \
-        unless dep.requirement.requirements.reject! { |dependency_requirements| dependency_requirements == r } \
-          abort("Requirement '#{r.first} #{r.last}' was not possible to remove for dependency '#{dep}'!") \
-        end \
-      end \
-      spec.dependencies.delete dep if dep.requirement.requirements.empty? \
-    else \
-      spec.dependencies.delete dep \
-    end \
-  else \
-    abort("Dependency '#{name}' was not found!") \
-  end \
-  File.write '.%{gem_spec}', spec.to_ruby \
-EOR\
-echo "$gemspec_remove_dep_script" | ruby \
-unset -v gemspec_remove_dep_script \
-%{nil}
-
 Name: rubygem-%{gem_name}
 Version: 1.38.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Brings clouds to you
 Group: Development/Languages
 # ASL 2.0: lib/fog/opennebula/requests/compute/OpenNebulaVNC.rb
@@ -136,31 +56,32 @@ BuildArch: noarch
 Documentation for %{name}.
 
 %prep
-%setup -q -c -T
-%gem_install -n %{SOURCE0}
+gem unpack %{SOURCE0}
 
-pushd .%{gem_instdir}
+%setup -q -D -T -n  %{gem_name}-%{version}
+
+gem spec %{SOURCE0} -l --ruby > %{gem_name}.gemspec
+
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
-popd
 
+sed -i -r 's| "tests/hp.*"(\.freeze)?,||g' %{gem_name}.gemspec
 
 # Remove dependencies not in Fedora yet.
 # TODO: Aliyun, Local and Vsphere seems to be in default set, anybody wants
 # to package them?
-%gemspec_remove_dep -g fog-aliyun -s .%{gem_spec} '>= 0.1.0'
-%gemspec_remove_dep -g fog-cloudatcost -s .%{gem_spec} '~> 0.1.0'
-%gemspec_remove_dep -g fog-dynect -s .%{gem_spec} '~> 0.0.2'
-%gemspec_remove_dep -g fog-google -s .%{gem_spec} '<= 0.1.0'
-%gemspec_remove_dep -g fog-local -s .%{gem_spec} '>= 0'
-%gemspec_remove_dep -g fog-openstack -s .%{gem_spec} '>= 0'
-%gemspec_remove_dep -g fog-powerdns -s .%{gem_spec} '>= 0.1.1'
-%gemspec_remove_dep -g fog-rackspace -s .%{gem_spec} '>= 0'
-%gemspec_remove_dep -g fog-vsphere -s .%{gem_spec} '>= 0.4.0'
-%gemspec_remove_dep -g fog-xenserver -s .%{gem_spec} '>= 0'
+%gemspec_remove_dep -g fog-aliyun '>= 0.1.0'
+%gemspec_remove_dep -g fog-cloudatcost '~> 0.1.0'
+%gemspec_remove_dep -g fog-dynect '~> 0.0.2'
+%gemspec_remove_dep -g fog-google '<= 0.1.0'
+%gemspec_remove_dep -g fog-local '>= 0'
+%gemspec_remove_dep -g fog-openstack '>= 0'
+%gemspec_remove_dep -g fog-powerdns '>= 0.1.1'
+%gemspec_remove_dep -g fog-rackspace '>= 0'
+%gemspec_remove_dep -g fog-vsphere '>= 0.4.0'
+%gemspec_remove_dep -g fog-xenserver '>= 0'
 
-pushd .%{gem_instdir}
 sed -i '/dynect/ s/^/#/' ./lib/fog.rb
 sed -i '/google/ s/^/#/' ./lib/fog.rb
 sed -i '/local/ s/^/#/' ./lib/fog.rb
@@ -180,9 +101,16 @@ sed -i '/powerdns/ s/^/#/' ./lib/fog/bin.rb
 sed -i '/vsphere/ s/^/#/' ./lib/fog/bin.rb
 sed -i '/xenserver/ s/^/#/' ./lib/fog/bin.rb
 sed -i '/aliyun/ s/^/#/' ./lib/fog/bin.rb
-popd
+
+sed -i '/openstack/,/},$/ s/^/#/' tests/compute/helper.rb
+sed -i '/rackspace/,/}$/ s/^/#/' tests/compute/helper.rb
+
+sed -i '/dynect/,/},$/ s/^/#/' tests/dns/helper.rb
+sed -i '/rackspace/,/},$/ s/^/#/' tests/dns/helper.rb
 
 %build
+gem build %{gem_name}.gemspec
+%gem_install
 
 %install
 mkdir -p %{buildroot}%{gem_dir}
@@ -203,16 +131,11 @@ chmod a-x %{buildroot}%{gem_libdir}/fog/opennebula/README.md
 
 %check
 pushd .%{gem_instdir}
-# Ignore dependencies not in Fedora yet.
-sed -i '/openstack/,/},/ s/^/#/' tests/compute/helper.rb
-sed -i '/rackspace/,/}$/ s/^/#/' tests/compute/helper.rb
+# These tests expects fog-digitalocean.
+rm -rf tests/digitalocean
 
-sed -i '/dynect/,/},/ s/^/#/' tests/dns/helper.rb
-sed -i '/rackspace/,/},/ s/^/#/' tests/dns/helper.rb
-
-FOG_MOCK=true shindo
+FOG_MOCK=true shindont
 popd
-
 
 %files
 %dir %{gem_instdir}
@@ -241,6 +164,9 @@ popd
 %exclude %{gem_instdir}/tests/go_grid/requests/compute/image_tests.rb
 
 %changelog
+* Thu Feb 23 2017 Vít Ondruch <vondruch@redhat.com> - 1.38.0-3
+- Fix FTBFS in Rawhide (rhbz#1424311).
+
 * Sat Feb 11 2017 Fedora Release Engineering <releng@fedoraproject.org> - 1.38.0-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
 
