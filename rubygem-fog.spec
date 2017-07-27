@@ -2,7 +2,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.38.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: Brings clouds to you
 Group: Development/Languages
 # ASL 2.0: lib/fog/opennebula/requests/compute/OpenNebulaVNC.rb
@@ -164,6 +164,9 @@ popd
 %exclude %{gem_instdir}/tests/go_grid/requests/compute/image_tests.rb
 
 %changelog
+* Thu Jul 27 2017 Fedora Release Engineering <releng@fedoraproject.org> - 1.38.0-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
+
 * Thu Feb 23 2017 Vít Ondruch <vondruch@redhat.com> - 1.38.0-3
 - Fix FTBFS in Rawhide (rhbz#1424311).
 
