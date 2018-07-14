@@ -2,7 +2,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 1.38.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: Brings clouds to you
 Group: Development/Languages
 # ASL 2.0: lib/fog/opennebula/requests/compute/OpenNebulaVNC.rb
@@ -164,6 +164,9 @@ popd
 %exclude %{gem_instdir}/tests/go_grid/requests/compute/image_tests.rb
 
 %changelog
+* Sat Jul 14 2018 Fedora Release Engineering <releng@fedoraproject.org> - 1.38.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
+
 * Fri Feb 09 2018 Fedora Release Engineering <releng@fedoraproject.org> - 1.38.0-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
 
