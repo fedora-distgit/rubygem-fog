@@ -1,19 +1,20 @@
 %global gem_name fog
 
 Name: rubygem-%{gem_name}
-Version: 1.38.0
-Release: 6%{?dist}
+Version: 2.0.0
+Release: 1%{?dist}
 Summary: Brings clouds to you
-Group: Development/Languages
 # ASL 2.0: lib/fog/opennebula/requests/compute/OpenNebulaVNC.rb
 License: MIT or ASL 2.0
 URL: http://github.com/fog/fog
 Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
-# Drop deprecated HPCloud support from test suite.
-# https://github.com/fog/fog/pull/3912
-Patch0: rubygem-fog-1.38.0-Drop-hp-from-compute-tests.patch
-Patch1: rubygem-fog-1.38.0-Drop-hp-from-storage-tests.patch
-Patch2: rubygem-fog-1.38.0-Drop-hp-test-cases.patch
+# Fix "Fog::Compute[:cloudsigma] | volume requests (cloudsigma)" test.
+# https://github.com/fog/fog/pull/3997/commits/74d6977b5ac9957bf7a48c390eeb816faf87186a
+Patch0: rubygem-fog-2.0.0-Tweak-CloudSigma-testing-schema.patch
+# Avoid CloudSigma test issues due to bugs in it mocking interface.
+# https://github.com/fog/fog/pull/3997/commits/4fb6da70e12ae5dc1205ab40b3fdf135ce364ad0
+Patch1: rubygem-fog-2.0.0-Make-CloudSigma-snapshot-tests-pending.patch
+Requires: ruby(irb)
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
 BuildRequires: ruby
@@ -35,8 +36,9 @@ BuildRequires: rubygem(fog-vmfusion)
 BuildRequires: rubygem(fog-voxel)
 BuildRequires: rubygem(fog-xml)
 BuildRequires: rubygem(mime-types)
+BuildRequires: rubygem(minitest)
+BuildRequires: rubygem(minitest-stub-const)
 BuildRequires: rubygem(opennebula)
-BuildRequires: rubygem(rbovirt)
 BuildRequires: %{_bindir}/shindo
 BuildArch: noarch
 
@@ -48,7 +50,6 @@ for most AWS services including EC2, S3, CloudWatch, SimpleDB, ELB, and RDS.
 
 %package doc
 Summary: Documentation for %{name}
-Group: Documentation
 Requires: %{name} = %{version}-%{release}
 BuildArch: noarch
 
@@ -56,60 +57,74 @@ BuildArch: noarch
 Documentation for %{name}.
 
 %prep
-gem unpack %{SOURCE0}
-
-%setup -q -D -T -n  %{gem_name}-%{version}
-
-gem spec %{SOURCE0} -l --ruby > %{gem_name}.gemspec
+%setup -q -n %{gem_name}-%{version}
 
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
 
-sed -i -r 's| "tests/hp.*"(\.freeze)?,||g' %{gem_name}.gemspec
+# Relax fog-core dependency. All tests are passing with older fog-core. Will
+# see soon how fog-core 2.0.0+ works.
+%gemspec_remove_dep -g fog-core '~> 1.45'
+%gemspec_add_dep -g fog-core '>= 1.43'
 
 # Remove dependencies not in Fedora yet.
 # TODO: Aliyun, Local and Vsphere seems to be in default set, anybody wants
 # to package them?
 %gemspec_remove_dep -g fog-aliyun '>= 0.1.0'
 %gemspec_remove_dep -g fog-cloudatcost '~> 0.1.0'
+%gemspec_remove_dep -g fog-digitalocean '>= 0.3.0'
+%gemspec_remove_dep -g fog-dnsimple '~> 1.0.0'
 %gemspec_remove_dep -g fog-dynect '~> 0.0.2'
 %gemspec_remove_dep -g fog-google '<= 0.1.0'
+%gemspec_remove_dep -g fog-internet-archive '>= 0'
+%gemspec_remove_dep -g fog-joyent '>= 0'
 %gemspec_remove_dep -g fog-local '>= 0'
 %gemspec_remove_dep -g fog-openstack '>= 0'
+%gemspec_remove_dep -g fog-ovirt '>= 0'
 %gemspec_remove_dep -g fog-powerdns '>= 0.1.1'
 %gemspec_remove_dep -g fog-rackspace '>= 0'
 %gemspec_remove_dep -g fog-vsphere '>= 0.4.0'
 %gemspec_remove_dep -g fog-xenserver '>= 0'
 
-sed -i '/dynect/ s/^/#/' ./lib/fog.rb
-sed -i '/google/ s/^/#/' ./lib/fog.rb
-sed -i '/local/ s/^/#/' ./lib/fog.rb
-sed -i '/rackspace/ s/^/#/' ./lib/fog.rb
-sed -i '/openstack/ s/^/#/' ./lib/fog.rb
-sed -i '/powerdns/ s/^/#/' ./lib/fog.rb
-sed -i '/vsphere/ s/^/#/' ./lib/fog.rb
-sed -i '/xenserver/ s/^/#/' ./lib/fog.rb
-sed -i '/aliyun/ s/^/#/' ./lib/fog.rb
-
-sed -i '/dynect/ s/^/#/' ./lib/fog/bin.rb
-sed -i '/google/ s/^/#/' ./lib/fog/bin.rb
-sed -i '/local/ s/^/#/' ./lib/fog/bin.rb
-sed -i '/rackspace/ s/^/#/' ./lib/fog/bin.rb
-sed -i '/openstack/ s/^/#/' ./lib/fog/bin.rb
-sed -i '/powerdns/ s/^/#/' ./lib/fog/bin.rb
-sed -i '/vsphere/ s/^/#/' ./lib/fog/bin.rb
-sed -i '/xenserver/ s/^/#/' ./lib/fog/bin.rb
-sed -i '/aliyun/ s/^/#/' ./lib/fog/bin.rb
+for p in \
+  aliyun \
+  digitalocean \
+  dnsimple \
+  dynect \
+  google \
+  internet_archive \
+  joyent \
+  local \
+  openstack \
+  ovirt \
+  powerdns \
+  rackspace \
+  vsphere \
+  xenserver
+do
+  sed -i "/${p}/ s/^/#/" ./lib/fog{.rb,/bin.rb}
+  sed -i "/${p}/I s/^/#/" spec/fog/bin_spec.rb
+done
 
 sed -i '/openstack/,/},$/ s/^/#/' tests/compute/helper.rb
 sed -i '/rackspace/,/}$/ s/^/#/' tests/compute/helper.rb
 
+sed -i '/dnsimple/,/},$/ s/^/#/' tests/dns/helper.rb
 sed -i '/dynect/,/},$/ s/^/#/' tests/dns/helper.rb
 sed -i '/rackspace/,/},$/ s/^/#/' tests/dns/helper.rb
 
+sed -i "/internetarchive/I s/^/#/" spec/fog/bin_spec.rb
+
+# Fix "Cloudstack | escape (cloudstack)" compatibility with Ruby 2.5.
+# https://github.com/fog/fog/issues/4016
+sed -i 's/%7E/~/' tests/cloudstack/signed_params_tests.rb
+
 %build
-gem build %{gem_name}.gemspec
+# Create the gem as gem install only works on a gem file
+gem build ../%{gem_name}-%{version}.gemspec
+
+# %%gem_install compiles any C extensions and installs the gem into ./%%gem_dir
+# by default, so that we can move it into the buildroot in %%install
 %gem_install
 
 %install
@@ -119,22 +134,39 @@ cp -a .%{gem_dir}/* \
 
 
 mkdir -p %{buildroot}%{_bindir}
-cp -pa .%{_bindir}/* \
+cp -a .%{_bindir}/* \
         %{buildroot}%{_bindir}/
 
 find %{buildroot}%{gem_instdir}/bin -type f | xargs chmod a+x
 
-# Drop the executable bit.
-# https://github.com/fog/fog/commit/9c8316bb9e3a1e839577b616ae37aac577dbb6af
-chmod a-x %{buildroot}%{gem_libdir}/fog/opennebula/README.md
-
-
 %check
 pushd .%{gem_instdir}
-# These tests expects fog-digitalocean.
-rm -rf tests/digitalocean
 
 FOG_MOCK=true shindont
+
+for p in \
+  dnsimple \
+  dynect \
+  google \
+  joyent \
+  local \
+  openstack \
+  powerdns \
+  rackspace \
+  vsphere \
+  xenserver
+do
+  rm spec/fog/bin/${p}_spec.rb
+done
+
+# fog-google providing this contant is not available.
+sed -i '/it "responds to collections" do/,/^    end$/ s/^/#/' spec/helpers/bin.rb
+
+# There two does not run properly together in single test run.
+# This might be fix:
+# https://github.com/fog/fog/pull/3997/commits/69e28fe870cedc6d9e54c626f922760c47178404
+FOG_MOCK=true ruby -Ispec -rspec_helper -e 'Dir.glob "./spec/fog/**/*_spec.rb", &method(:require)'
+FOG_MOCK=true ruby -Ispec -rspec_helper -e 'Dir.glob "./spec/vcloud_director/**/*_spec.rb", &method(:require)'
 popd
 
 %files
@@ -164,6 +196,9 @@ popd
 %exclude %{gem_instdir}/tests/go_grid/requests/compute/image_tests.rb
 
 %changelog
+* Wed Oct 10 2018 Vít Ondruch <vondruch@redhat.com> - 2.0.0-1
+- Update to fog 2.0.0.
+
 * Sat Jul 14 2018 Fedora Release Engineering <releng@fedoraproject.org> - 1.38.0-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
 

@@ -1,0 +1,30 @@
+From 74d6977b5ac9957bf7a48c390eeb816faf87186a Mon Sep 17 00:00:00 2001
+From: Paul Thornthwaite <tokengeek@gmail.com>
+Date: Tue, 19 Jun 2018 12:06:43 +0100
+Subject: [PATCH] Tweak CloudSigma testing schema
+
+The test schema for volumes had `storage_type` as a `String` which was
+not being returned by the mock implementation.
+
+According to the API docs I checked, it is an allowed value (but the
+returned fields are controlled by the request).
+
+So this makes the type `Fog::Nullable::String` so the schema passes if
+the key/value are absent.
+---
+ tests/cloudsigma/requests/volumes_tests.rb | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/cloudsigma/requests/volumes_tests.rb b/tests/cloudsigma/requests/volumes_tests.rb
+index 13bb6df419..73d1a346d1 100644
+--- a/tests/cloudsigma/requests/volumes_tests.rb
++++ b/tests/cloudsigma/requests/volumes_tests.rb
+@@ -14,7 +14,7 @@
+       'resource_uri' => Fog::Nullable::String,
+       'size' => Integer,
+       'status' => String,
+-      'storage_type' => String,
++      'storage_type' => Fog::Nullable::String,
+       'tags' => Array
+   }
+ 
