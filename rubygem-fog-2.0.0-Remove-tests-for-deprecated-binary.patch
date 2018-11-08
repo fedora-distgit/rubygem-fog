@@ -1,0 +1,116 @@
+From 0bda54cff981dee7392bbcaa3a553cd4f298437b Mon Sep 17 00:00:00 2001
+From: Paul Thornthwaite <tokengeek@gmail.com>
+Date: Mon, 18 Jun 2018 17:57:41 +0100
+Subject: [PATCH] Remove tests for deprecated binary `#[]`
+
+Fog originally allowed use of `Provider[:service]` to generate a new
+instance of a service. This was deprecated since it was not portable.
+Using `AWS[:compute]` makes it harder to switch providers since all the
+classes needed renaming. Ideally `Compute[@provider]` would be used and
+can be configured within an application.
+
+The `fog` script ("binary") had a number of backwards-compatibility
+specs have been testing that the old methods worked. These generated
+deprecation warnings as they ran.
+
+Whilst the behaviour is still intact, this removes the tests that are
+creating deprecation noise since no one is likely to be using them.
+---
+ spec/fog/bin/atmos_spec.rb          | 10 ----------
+ spec/fog/bin/aws_spec.rb            | 18 ------------------
+ spec/fog/bin/baremetalcloud_spec.rb | 10 ----------
+ spec/fog/bin/bluebox_spec.rb        | 18 ------------------
+ 4 files changed, 56 deletions(-)
+
+diff --git a/spec/fog/bin/atmos_spec.rb b/spec/fog/bin/atmos_spec.rb
+index 2fe9d052bc..9067ad5736 100644
+--- a/spec/fog/bin/atmos_spec.rb
++++ b/spec/fog/bin/atmos_spec.rb
+@@ -20,14 +20,4 @@
+       end
+     end
+   end
+-
+-  describe "#[]" do
+-    describe "when requesting storage service" do
+-      it "returns instance" do
+-        Fog::Storage::Atmos.stub(:new, "instance") do
+-          assert_equal "instance", Atmos[:storage]
+-        end
+-      end
+-    end
+-  end
+ end
+diff --git a/spec/fog/bin/aws_spec.rb b/spec/fog/bin/aws_spec.rb
+index 4f7f30e60c..6ae9d20f8d 100644
+--- a/spec/fog/bin/aws_spec.rb
++++ b/spec/fog/bin/aws_spec.rb
+@@ -77,22 +77,4 @@
+       end
+     end
+   end
+-
+-  describe "#[]" do
+-    describe "when service is recognised" do
+-      it "returns correct instance" do
+-        KEY_CLASS_MAPPING.each do |key, klass|
+-          klass.stub(:new, "#{klass} instance") do
+-            assert_equal "#{klass} instance", AWS[key]
+-          end
+-        end
+-      end
+-    end
+-
+-    describe "when service is not recognised" do
+-      it "raises ArgumentError" do
+-        assert_raises(ArgumentError) { AWS[:bad_service] }
+-      end
+-    end
+-  end
+ end
+diff --git a/spec/fog/bin/baremetalcloud_spec.rb b/spec/fog/bin/baremetalcloud_spec.rb
+index cc5e343bb2..f2a9e53e00 100644
+--- a/spec/fog/bin/baremetalcloud_spec.rb
++++ b/spec/fog/bin/baremetalcloud_spec.rb
+@@ -20,14 +20,4 @@
+       end
+     end
+   end
+-
+-  describe "#[]" do
+-    describe "when requesting compute service" do
+-      it "returns instance" do
+-        Fog::Compute::BareMetalCloud.stub(:new, "instance") do
+-          assert_equal "instance", BareMetalCloud[:compute]
+-        end
+-      end
+-    end
+-  end
+ end
+diff --git a/spec/fog/bin/bluebox_spec.rb b/spec/fog/bin/bluebox_spec.rb
+index 119a292054..5c94d05067 100644
+--- a/spec/fog/bin/bluebox_spec.rb
++++ b/spec/fog/bin/bluebox_spec.rb
+@@ -34,22 +34,4 @@
+       end
+     end
+   end
+-
+-  describe "#[]" do
+-    describe "when requesting compute service" do
+-      it "returns instance" do
+-        Fog::Compute::Bluebox.stub(:new, "instance") do
+-          assert_equal "instance", Bluebox[:compute]
+-        end
+-      end
+-    end
+-
+-    describe "when requesting dns service" do
+-      it "returns instance" do
+-        Fog::DNS::Bluebox.stub(:new, "instance") do
+-          assert_equal "instance", Bluebox[:dns]
+-        end
+-      end
+-    end
+-  end
+ end
