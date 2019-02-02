@@ -2,7 +2,7 @@
 
 Name: rubygem-%{gem_name}
 Version: 2.0.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Brings clouds to you
 # ASL 2.0: lib/fog/opennebula/requests/compute/OpenNebulaVNC.rb
 License: MIT or ASL 2.0
@@ -226,6 +226,9 @@ popd
 %exclude %{gem_instdir}/tests/go_grid/requests/compute/image_tests.rb
 
 %changelog
+* Sat Feb 02 2019 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.0-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
+
 * Thu Nov 08 2018 Vít Ondruch <vondruch@redhat.com> - 2.0.0-2
 - Fix fog-core 2.x+ compatibility.
 
