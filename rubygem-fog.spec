@@ -1,32 +1,15 @@
 %global gem_name fog
 
 Name: rubygem-%{gem_name}
-Version: 2.0.0
-Release: 3%{?dist}
+Version: 2.1.0
+Release: 1%{?dist}
 Summary: Brings clouds to you
 # ASL 2.0: lib/fog/opennebula/requests/compute/OpenNebulaVNC.rb
 License: MIT or ASL 2.0
-URL: http://github.com/fog/fog
+URL: https://github.com/fog/fog
 Source0: https://rubygems.org/gems/%{gem_name}-%{version}.gem
-# Fix "Fog::Compute[:cloudsigma] | volume requests (cloudsigma)" test.
-# https://github.com/fog/fog/pull/3997/commits/74d6977b5ac9957bf7a48c390eeb816faf87186a
-Patch0: rubygem-fog-2.0.0-Tweak-CloudSigma-testing-schema.patch
-# Avoid CloudSigma test issues due to bugs in it mocking interface.
-# https://github.com/fog/fog/pull/3997/commits/4fb6da70e12ae5dc1205ab40b3fdf135ce364ad0
-Patch1: rubygem-fog-2.0.0-Make-CloudSigma-snapshot-tests-pending.patch
-# Remove tests for deprecated binary `#[]`
-# https://github.com/fog/fog/commit/0bda54cff981dee7392bbcaa3a553cd4f298437b
-Patch2: rubygem-fog-2.0.0-Remove-tests-for-deprecated-binary.patch
-# BlueBox is not offered anymore and the tests has issues with fog-core 2.x+.
-# https://github.com/fog/fog/pull/4010
-Patch3: rubygem-fog-2.0.0-Remove-BlueBox-Blocks.patch
-# Fix (remove) some failing tests incompatible with fog-core 2.x+.
-# https://github.com/fog/fog/commit/676ccd810f2b677510b438fd3ae2ba94c1897706
-Patch4: rubygem-fog-2.0.0-remove-tests-around-deprecated-usage.patch
-# Fix namespaces for fog-brightbox 1.0.0+ compatibility.
-# https://github.com/fog/fog/pull/4018
-Patch5: rubygem-fog-2.0.0-Fix-compatibility-with-fog-brightbox-1.0.0.patch
 Requires: ruby(irb)
+Requires: rubygem(bigdecimal)
 BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
 BuildRequires: ruby
@@ -47,7 +30,6 @@ BuildRequires: rubygem(fog-terremark)
 BuildRequires: rubygem(fog-vmfusion)
 BuildRequires: rubygem(fog-voxel)
 BuildRequires: rubygem(fog-xml)
-BuildRequires: rubygem(mime-types)
 BuildRequires: rubygem(minitest)
 BuildRequires: rubygem(minitest-stub-const)
 BuildRequires: rubygem(opennebula)
@@ -71,19 +53,6 @@ Documentation for %{name}.
 %prep
 %setup -q -n %{gem_name}-%{version}
 
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch5 -p1
-
-%gemspec_remove_file -t Dir["spec/fog/bin/bluebox_spec.rb", "tests/bluebox/**/*.rb"]
-%gemspec_remove_file Dir["lib/fog/bin/bluebox.rb", "lib/fog/bluebox.rb", "lib/fog/bluebox/**/*.rb", "spec/fog/bin/bluebox_spec.rb", "tests/bluebox/**/*.rb"]
-%patch3 -p1
-
-%gemspec_remove_file -t ["spec/fog/compute_spec.rb", "spec/fog/dns_spec.rb"]
-%gemspec_remove_file ["spec/fog/compute_spec.rb", "spec/fog/dns_spec.rb"]
-%patch4 -p1
-
 # Relax fog-core dependency. All tests are passing with older fog-core. Will
 # see soon how fog-core 2.0.0+ works.
 %gemspec_remove_dep -g fog-core '~> 1.45'
@@ -97,7 +66,7 @@ Documentation for %{name}.
 %gemspec_remove_dep -g fog-digitalocean '>= 0.3.0'
 %gemspec_remove_dep -g fog-dnsimple '~> 1.0.0'
 %gemspec_remove_dep -g fog-dynect '~> 0.0.2'
-%gemspec_remove_dep -g fog-google '<= 0.1.0'
+%gemspec_remove_dep -g fog-google '~> 1.0.0'
 %gemspec_remove_dep -g fog-internet-archive '>= 0'
 %gemspec_remove_dep -g fog-joyent '>= 0'
 %gemspec_remove_dep -g fog-local '>= 0'
@@ -192,11 +161,7 @@ done
 # fog-google providing this contant is not available.
 sed -i '/it "responds to collections" do/,/^    end$/ s/^/#/' spec/helpers/bin.rb
 
-# These two does not run properly together in single test run.
-# This might be fix:
-# https://github.com/fog/fog/pull/3997/commits/69e28fe870cedc6d9e54c626f922760c47178404
-FOG_MOCK=true ruby -Ispec -rspec_helper -e 'Dir.glob "./spec/fog/**/*_spec.rb", &method(:require)'
-FOG_MOCK=true ruby -Ispec -rspec_helper -e 'Dir.glob "./spec/vcloud_director/**/*_spec.rb", &method(:require)'
+FOG_MOCK=true ruby -Ispec -rspec_helper -e 'Dir.glob "./spec/**/*_spec.rb", &method(:require)'
 popd
 
 %files
@@ -226,6 +191,9 @@ popd
 %exclude %{gem_instdir}/tests/go_grid/requests/compute/image_tests.rb
 
 %changelog
+* Thu Mar 07 2019 Vít Ondruch <vondruch@redhat.com> - 2.1.0-1
+- Update to Fog 2.1.0.
+
 * Sat Feb 02 2019 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.0-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
 
