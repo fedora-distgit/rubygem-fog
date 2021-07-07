@@ -14,21 +14,9 @@ BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
 BuildRequires: ruby
 BuildRequires: rubygem(bigdecimal)
-BuildRequires: rubygem(fog-atmos)
 BuildRequires: rubygem(fog-aws)
-BuildRequires: rubygem(fog-brightbox)
 BuildRequires: rubygem(fog-core)
-BuildRequires: rubygem(fog-ecloud)
 BuildRequires: rubygem(fog-json)
-BuildRequires: rubygem(fog-profitbricks)
-BuildRequires: rubygem(fog-riakcs)
-BuildRequires: rubygem(fog-sakuracloud)
-BuildRequires: rubygem(fog-serverlove)
-BuildRequires: rubygem(fog-softlayer)
-BuildRequires: rubygem(fog-storm_on_demand)
-BuildRequires: rubygem(fog-terremark)
-BuildRequires: rubygem(fog-vmfusion)
-BuildRequires: rubygem(fog-voxel)
 BuildRequires: rubygem(fog-xml)
 BuildRequires: rubygem(minitest)
 BuildRequires: rubygem(minitest-stub-const)
@@ -53,16 +41,10 @@ Documentation for %{name}.
 %prep
 %setup -q -n %{gem_name}-%{version}
 
-# Relax fog-core dependency. All tests are passing with older fog-core. Will
-# see soon how fog-core 2.0.0+ works.
-%gemspec_remove_dep -g fog-core '~> 1.45'
-%gemspec_add_dep -g fog-core '>= 1.43'
-
 # Remove dependencies not in Fedora yet.
 # TODO: Aliyun, Local and Vsphere seems to be in default set, anybody wants
 # to package them?
 %gemspec_remove_dep -g fog-aliyun '>= 0.1.0'
-%gemspec_remove_dep -g fog-cloudatcost '~> 0.1.0'
 %gemspec_remove_dep -g fog-digitalocean '>= 0.3.0'
 %gemspec_remove_dep -g fog-dnsimple '~> 1.0.0'
 %gemspec_remove_dep -g fog-dynect '~> 0.0.2'
