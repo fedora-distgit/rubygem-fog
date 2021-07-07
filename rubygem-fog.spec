@@ -1,7 +1,7 @@
 %global gem_name fog
 
 Name: rubygem-%{gem_name}
-Version: 2.1.0
+Version: 2.2.0
 Release: 1%{?dist}
 Summary: Brings clouds to you
 # ASL 2.0: lib/fog/opennebula/requests/compute/OpenNebulaVNC.rb
@@ -191,6 +191,9 @@ popd
 %exclude %{gem_instdir}/tests/go_grid/requests/compute/image_tests.rb
 
 %changelog
+* Wed Jul 07 2021 Pavel Valena <pvalena@redhat.com> - 2.2.0-1
+- Update to fog 2.2.0.
+
 * Thu Mar 07 2019 Vít Ondruch <vondruch@redhat.com> - 2.1.0-1
 - Update to Fog 2.1.0.
 
