@@ -14,7 +14,6 @@ BuildRequires: ruby(release)
 BuildRequires: rubygems-devel
 BuildRequires: ruby
 BuildRequires: rubygem(bigdecimal)
-BuildRequires: rubygem(fog-aws)
 BuildRequires: rubygem(fog-core)
 BuildRequires: rubygem(fog-json)
 BuildRequires: rubygem(fog-xml)
@@ -46,11 +45,9 @@ Documentation for %{name}.
 # to package them?
 %gemspec_remove_dep -g fog-aliyun '>= 0.1.0'
 %gemspec_remove_dep -g fog-digitalocean '>= 0.3.0'
-%gemspec_remove_dep -g fog-dnsimple '~> 1.0.0'
 %gemspec_remove_dep -g fog-dynect '~> 0.0.2'
 %gemspec_remove_dep -g fog-google '~> 1.0.0'
 %gemspec_remove_dep -g fog-internet-archive '>= 0'
-%gemspec_remove_dep -g fog-joyent '>= 0'
 %gemspec_remove_dep -g fog-local '>= 0'
 %gemspec_remove_dep -g fog-openstack '>= 0'
 %gemspec_remove_dep -g fog-ovirt '>= 0'
@@ -59,11 +56,18 @@ Documentation for %{name}.
 %gemspec_remove_dep -g fog-vsphere '>= 0.4.0'
 %gemspec_remove_dep -g fog-xenserver '>= 0'
 
+echo
+
 for p in \
   aliyun \
+  atmos \
+  aws \
+  brightbox \
+  cloudstack \
   digitalocean \
   dnsimple \
   dynect \
+  ecloud \
   google \
   internet_archive \
   joyent \
@@ -71,8 +75,18 @@ for p in \
   openstack \
   ovirt \
   powerdns \
+  profitbricks \
   rackspace \
+  riakcs \
+  sakuracloud \
+  serverlove \
+  softlayer \
+  storm_on_demand \
+  terremark \
+  w11qqqterremark \
   vsphere \
+  vmfusion \
+  voxel \
   xenserver
 do
   sed -i "/${p}/ s/^/#/" ./lib/fog{.rb,/bin.rb}
@@ -87,10 +101,6 @@ sed -i '/dynect/,/},$/ s/^/#/' tests/dns/helper.rb
 sed -i '/rackspace/,/},$/ s/^/#/' tests/dns/helper.rb
 
 sed -i "/internetarchive/I s/^/#/" spec/fog/bin_spec.rb
-
-# Fix "Cloudstack | escape (cloudstack)" compatibility with Ruby 2.5.
-# https://github.com/fog/fog/issues/4016
-sed -i 's/%7E/~/' tests/cloudstack/signed_params_tests.rb
 
 %build
 # Create the gem as gem install only works on a gem file
